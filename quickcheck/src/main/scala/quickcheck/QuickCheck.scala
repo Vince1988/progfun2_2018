@@ -1,15 +1,17 @@
 package quickcheck
 
-import common._
-
+import org.scalacheck.Arbitrary._
+import org.scalacheck.Gen._
+import org.scalacheck.Prop._
 import org.scalacheck._
-import Arbitrary._
-import Gen._
-import Prop._
 
 abstract class QuickCheckHeap extends Properties("Heap") with IntHeap {
 
-  lazy val genHeap: Gen[H] = ???
+  lazy val genHeap: Gen[H] = oneOf(const(empty), for {
+    value <- arbitrary[Int]
+    heap <- genHeap
+  } yield insert(value, heap))
+
   implicit lazy val arbHeap: Arbitrary[H] = Arbitrary(genHeap)
 
   property("gen1") = forAll { (h: H) =>
