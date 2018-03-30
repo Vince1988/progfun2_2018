@@ -51,4 +51,16 @@ class CalculatorSuite extends FunSuite with ShouldMatchers {
     assert(resultRed2() == "red")
   }
 
+  test("calculatorSelfReference") {
+    assert(Calculator.computeValues(Map("a" -> Signal(Ref("a"))))("a")().isNaN)
+  }
+
+  test("calculatorCyclicReference") {
+    val references: Map[String, Signal[Expr]] = Map(
+      "a" -> Signal(Plus(Ref("b"), Literal(10))),
+      "b" -> Signal(Minus(Ref("a"), Literal(5)))
+    )
+    assert(Calculator.computeValues(references)("a")().isNaN)
+  }
+
 }
